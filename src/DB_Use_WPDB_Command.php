@@ -1312,20 +1312,23 @@ class WP_CLI_DB_Use_WPDB_Command {
 	 * @return string[]
 	 */
 	private function get_tables( $assoc_args, $patterns = array() ) {
-		$wpdb = $this->get_wpdb( $assoc_args );
+		$wpdb       = $this->get_wpdb( $assoc_args );
+		$all_tables = $this->all_database_tables( $wpdb );
 
 		if ( $this->flag( $assoc_args, 'all-tables' ) ) {
-			$tables = $this->all_database_tables( $wpdb );
+			$tables = $all_tables;
 		} elseif ( $this->flag( $assoc_args, 'all-tables-with-prefix' ) ) {
 			$tables = $this->tables_with_prefix( $wpdb, $wpdb->prefix );
 		} elseif ( $this->flag( $assoc_args, 'network' ) && is_multisite() ) {
 			$tables = $this->network_tables( $wpdb, $this->assoc( $assoc_args, 'scope', 'all' ) );
+		} elseif ( $patterns ) {
+			$tables = $all_tables;
 		} else {
 			$scope  = $this->assoc( $assoc_args, 'scope', 'all' );
 			$tables = array_values( $wpdb->tables( $scope ) );
 		}
 
-		$existing = array_flip( $this->all_database_tables( $wpdb ) );
+		$existing = array_flip( $all_tables );
 		$tables   = array_values(
 			array_filter(
 				array_unique( $tables ),

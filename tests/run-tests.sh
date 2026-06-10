@@ -12,7 +12,8 @@ FAIL=0
 TABLE="wp_cli_db_use_wpdb_test"
 
 WP() {
-    npx wp-env run cli env WP_CLI_DB_USE_WPDB=always wp "$@" 2>&1
+    npx wp-env run cli env WP_CLI_DB_USE_WPDB=always wp "$@" 2>&1 \
+        | sed -e '/^ℹ Starting /d' -e 's/✔ Ran `.*$//'
 }
 
 check() {
@@ -49,6 +50,23 @@ not_check() {
     fi
 }
 
+check_line() {
+    local name="$1"
+    local expected="$2"
+    local actual="$3"
+
+    if echo "$actual" | grep -qxF -- "$expected"; then
+        echo "✓  $name"
+        PASS=$(( PASS + 1 ))
+    else
+        echo "✗  $name"
+        echo "   expected line: $expected"
+        printf '   actual output:\n'
+        echo "$actual" | sed 's/^/     /'
+        FAIL=$(( FAIL + 1 ))
+    fi
+}
+
 cleanup() {
     WP db query "DROP TABLE IF EXISTS ${TABLE}" --skip-column-names >/dev/null || true
 }
@@ -68,7 +86,7 @@ check "query help shows compatibility passthrough" "--<field>=<value>" "$out"
 check "query help shows batch option" "--batch" "$out"
 
 out=$(WP db prefix || true)
-check "prefix reads table prefix from wp-config.php" "wp_" "$out"
+check_line "prefix reads table prefix from wp-config.php" "wp_" "$out"
 
 cleanup
 
@@ -79,10 +97,10 @@ out=$(WP db query "INSERT INTO ${TABLE} (label) VALUES ('alpha'), ('beta')" || t
 not_check "insert rows has no SQL error" "Error:" "$out"
 
 out=$(WP db query "SELECT COUNT(*) FROM ${TABLE}" --skip-column-names || true)
-check "select count returns inserted rows" "2" "$out"
+check_line "select count returns inserted rows" "2" "$out"
 
 out=$(WP db tables "${TABLE}" || true)
-check "tables command finds created table" "${TABLE}" "$out"
+check_line "tables command finds created table" "${TABLE}" "$out"
 
 out=$(WP db tables --all-tables-with-prefix --format=csv || true)
 check "tables csv includes created table" "${TABLE}" "$out"
@@ -96,7 +114,7 @@ check "export stdout contains create table" "CREATE TABLE" "$out"
 check "export stdout contains table name" "${TABLE}" "$out"
 
 out=$(WP db search alpha "${TABLE}" --format=count || true)
-check "search finds inserted value" "1" "$out"
+check_line "search finds inserted value" "1" "$out"
 
 cleanup
 
