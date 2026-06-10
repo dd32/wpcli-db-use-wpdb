@@ -1,0 +1,14 @@
+{
+  "name": "wpcli-db-use-wpdb",
+  "description": "WP-CLI db command fallback that uses wpdb when MySQL client tooling is unavailable.",
+  "private": true,
+  "scripts": {
+    "env:start": "wp-env start",
+    "env:stop": "wp-env stop",
+    "env:destroy": "wp-env destroy",
+    "test": "bash tests/run-tests.sh"
+  },
+  "devDependencies": {
+    "@wordpress/env": "^11.8.0"
+  }
+}

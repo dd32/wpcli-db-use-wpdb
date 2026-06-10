@@ -1,0 +1,3 @@
+# Auto-load the wpdb-backed db fallback inside wp-env containers.
+require:
+  - wp-content/plugins/wpcli-db-use-wpdb/wp-cli-db-use-wpdb.php

@@ -1,0 +1,52 @@
+name: Test
+
+on:
+  push:
+    branches:
+      - trunk
+  pull_request:
+
+jobs:
+  test:
+    name: Integration tests (wp-env)
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 'lts/*'
+
+      - name: Install Node.js dependencies
+        run: npm install
+
+      - name: Validate Composer package
+        run: composer validate --no-check-publish
+
+      - name: Lint PHP
+        run: |
+          php -l wp-cli-db-use-wpdb.php
+          php -l src/DB_Use_WPDB_Command.php
+
+      - name: Cache wp-env
+        uses: actions/cache@v4
+        with:
+          path: ~/.wp-env
+          key: wp-env-${{ hashFiles('package.json', '.wp-env.json') }}
+          restore-keys: |
+            wp-env-
+
+      - name: Start wp-env
+        run: npx wp-env start
+
+      - name: Run tests
+        run: npm test
+
+      - name: Stop wp-env
+        run: npx wp-env stop
+        if: always()

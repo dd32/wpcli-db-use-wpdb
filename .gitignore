@@ -1,0 +1,6 @@
+node_modules/
+vendor/
+.wp-env/
+composer.lock
+package-lock.json
+*.sql

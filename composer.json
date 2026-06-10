@@ -1,0 +1,48 @@
+{
+  "name": "dd32/wpcli-db-use-wpdb",
+  "description": "WP-CLI db command fallback that uses wpdb when MySQL client tooling is unavailable.",
+  "type": "wp-cli-package",
+  "keywords": [
+    "wp-cli",
+    "database",
+    "wpdb",
+    "mysql"
+  ],
+  "license": "MIT",
+  "version": "0.1.0",
+  "require": {
+    "php": ">=7.4",
+    "wp-cli/wp-cli": "^2.8"
+  },
+  "autoload": {
+    "classmap": [
+      "src/"
+    ],
+    "files": [
+      "wp-cli-db-use-wpdb.php"
+    ]
+  },
+  "extra": {
+    "commands": [
+      "db",
+      "db check",
+      "db clean",
+      "db cli",
+      "db columns",
+      "db create",
+      "db drop",
+      "db export",
+      "db import",
+      "db optimize",
+      "db prefix",
+      "db query",
+      "db repair",
+      "db reset",
+      "db search",
+      "db size",
+      "db tables"
+    ]
+  },
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
